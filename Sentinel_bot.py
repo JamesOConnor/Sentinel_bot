@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import time
-import cv2
-import numpy as np
-import datetime
 import calendar
-from urllib.request import urlopen
 import json
-import os
-from random import randrange
+import time
 from datetime import timedelta
+from random import randrange
+from urllib.request import urlopen
+
+import cv2
+import glymur
+import numpy as np
 import numpy.ma as ma
+import tweepy  # https://github.com/tweepy/tweepy
 from geopy.geocoders import Nominatim
 from tqdm import *
-import glymur
-import tweepy  # https://github.com/tweepy/tweepy
+
 from grabba_grabba_hey import *
 
 screen_name = 'The account screen name, in this case "sentinel_bot"'
