@@ -384,7 +384,6 @@ def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secre
         except:
             print('tweet failed')
             continue
-        print('reached here')
         reload = True
         os.system('rm -r out_data')
 
