@@ -27,6 +27,7 @@ access_secret = 'Access secret'  # keep the quotes, replace this with your acces
 
 def get_all_tweets(screen_name, consumer_key, consumer_secret, access_key, access_secret):
     '''
+    Searches a twitter handle and downloads their most recent tweets
 	:param screen_name: Screen name of twitter account you want to query
 	:param consumer_key: Provided by twitter
 	:param consumer_secret: Provided by twitter
@@ -140,6 +141,7 @@ def get_country_osm(lat, lon):
 
 def checkifdone(tweet, tweets):
     '''
+    Checks to see if the loaded tweet has been posted within the last 3,000 tweets
     :param tweet: Tweet which is loaded and ready for distribution
     :param tweets: Array of the ~3000 most recent tweets from the bot
     :return: True if the tweet is not within the last ~3,000 tweets and hasn't been posted within the last week, otherwise False
