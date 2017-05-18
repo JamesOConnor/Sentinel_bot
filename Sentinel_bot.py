@@ -70,10 +70,12 @@ def get_all_tweets(screen_name, consumer_key, consumer_secret, access_key, acces
 
 
 def random_date(start, end):
-    """
-    This function will return a random datetime between two datetime
-    objects and a date one month in the future of that datetime.
-    """
+    '''
+    Returns a random date between two dates within our search timeframe, and a date a month after it
+    :param start: Start date
+    :param end: End date
+    :return: A date between these dates, and a date a month after that
+    '''
     delta = end - start
     int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
     random_second = randrange(int_delta)
@@ -295,6 +297,10 @@ def image_check(test, lat, lon, rd, rd2):
 
 
 def prepare_image():
+    '''
+    Given the directory that is cloned from AWS, this processes the image from the bands in the directory
+    :return: An image with a filesize which is generally < 3 mb
+    '''
     rsize = os.stat('B04.jp2')
     if int(rsize.st_size) < 13070000:
         os.system('rm -r out_data')
@@ -316,6 +322,16 @@ def prepare_image():
 
 
 def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secret):
+    '''
+    Starts an infinite loop which searches randomly, with a tropical bias, for decent quality satellite images
+    following some quick checks. The data is downloaded from AWS and processed into a small enough file to post.
+    :param screen_name: The name of the account to post to
+    :param consumer_key: Your key
+    :param consumer_secret: Your secret
+    :param access_key: Access key from twitter devs
+    :param access_secret: Access secret
+    :return: An infinite loop
+    '''
     bot_on = True
     delay_tweet = False
     reload = True
