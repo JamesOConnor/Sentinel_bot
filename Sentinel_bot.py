@@ -18,11 +18,11 @@ from tqdm import *
 
 from grabba_grabba_hey import *
 
-screen_name = 'The account screen name, in this case "sentinel_bot"'
-consumer_key = 'Twitter provided consumer key' # keep the quotes, replace this with your consumer key
-consumer_secret = 'Twitter provided consumer secret'  # keep the quotes, replace this with your consumer secret key
-access_key = 'Twitter provided access key'  # keep the quotes, replace this with your access token
-access_secret = 'Twitter provided access secret'  # keep the quotes, replace this with your access token secret
+screen_name = 'sentinel_bot'
+consumer_key = 'Your key'  # keep the quotes, replace this with your consumer key
+consumer_secret = 'Your secret'  # keep the quotes, replace this with your consumer secret key
+access_key = 'Access key'  # keep the quotes, replace this with your access token
+access_secret = 'Access secret'  # keep the quotes, replace this with your access token secret
 
 
 def get_all_tweets(screen_name, consumer_key, consumer_secret, access_key, access_secret):
@@ -54,7 +54,6 @@ def get_all_tweets(screen_name, consumer_key, consumer_secret, access_key, acces
     # keep grabbing tweets until there are no tweets left to grab
     print('Retrieving tweets')
     while len(new_tweets) > 0:
-
         # all subsiquent requests use the max_id param to prevent duplicates
         new_tweets = api.user_timeline(screen_name=screen_name, count=200, max_id=oldest)
 
@@ -66,13 +65,13 @@ def get_all_tweets(screen_name, consumer_key, consumer_secret, access_key, acces
 
     # transform the tweepy tweets into a 2D array
     latest_tweets = [str(tweet.text) for tweet in alltweets]
-
+    print('Tweets retrieved, starting random search...')
     return np.array(latest_tweets)
 
 
 def random_date(start, end):
     """
-    This function will return a random datetime between two datetime 
+    This function will return a random datetime between two datetime
     objects and a date one month in the future of that datetime.
     """
     delta = end - start
@@ -110,7 +109,7 @@ def get_country_osm(lat, lon):
     :return: Country of lat,lon according to OSMs' geolocater
     '''
     osm_geolocater = Nominatim()
-    loc = osm_geolocater.reverse("%f, %f" % (lat, lon), language='en')
+    loc = osm_geolocater.reverse((lat, lon), language='en')
     country = str(loc.raw['address']['country'])
     if country == 'Mexicanos':
         country = 'Mexico'
@@ -170,24 +169,18 @@ def get_place_check_valid():
         lon = (np.random.random() * 2 - 1) * 180
         try:
             country = get_country_google(lat, lon)
-            time.sleep(1)
-            if 'Caribbean' in country:
-                count += 2
-                continue
+            time.sleep(2)
             if 'water' in country:
                 count += 2
                 continue
         except:
             try:
                 country = get_country_osm(lat, lon)
-                if 'Caribbean' in country:
-                    count += 2
-                    continue
+                time.sleep(1)
                 if 'water' in country:
                     count += 2
                     continue
             except:
-                print('Rejecting international space')
                 count += 2
                 continue
         d1 = datetime.datetime.strptime('1/1/2016', '%m/%d/%Y')
@@ -212,7 +205,7 @@ def format_tweet(country, lat, lon):
     :param lon: Longitude
     :return:
     '''
-    month_to_int = dict((v,k) for k,v in enumerate(calendar.month_abbr))
+    month_to_int = dict((v, k) for k, v in enumerate(calendar.month_abbr))
     fp = [x[0] for x in os.walk(os.getcwd())][-2]  # The filepaths where preview images have been stored
     day = int(fp.split('\\')[-2])
     month = int(fp.split('\\')[-3])
@@ -226,7 +219,8 @@ def format_tweet(country, lat, lon):
     if country:
         country = str(country).replace(' ', '')
         country = country.replace("'", "")
-        country = country.replace("-", "")  #hacky formatting, need to fix
+        country = country.replace("-", "")  # hacky formatting, need to fix, individual country level \
+                                            # corrections are in order to make it typesafe/under char limit for twitter
         if 'States' in country:
             country = 'USA'
         if 'Ivoire' in country:
@@ -239,6 +233,8 @@ def format_tweet(country, lat, lon):
             country = 'RSA'
         if 'African' in country:
             country = 'CAR'
+        if 'Caribbean' in country:
+            country = 'The Caribbean'
         if 'Austrail' in country:
             country = 'Australia'
         if 'Congo' in country:
@@ -246,7 +242,7 @@ def format_tweet(country, lat, lon):
         if 'Myanmar' in country:
             country = 'Myanmar'
         tweet = 'Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space' % (
-            str(country), lat, lon, day, suffix, month, year, str(country))
+            str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')))
     else:
         tweet = 'Image of International space (%.2f, %.2f), from the %d%s of %s, %s' % (
             lat, lon, day, suffix, month, year)
@@ -271,7 +267,7 @@ def image_check(test, lat, lon, rd, rd2):
     for i in contrast:
         if i > 20:
             cc += 3
-    if cc<2:
+    if cc < 2:
         print("Not enough contrast")
         os.chdir('../../../../../../../../')
         os.system('rm -r out_data')
@@ -290,7 +286,7 @@ def image_check(test, lat, lon, rd, rd2):
         os.chdir('../../../../../../../../')
         try:
             print('Downloading raw data...')
-            out = download_sentinel_amazon(lat, lon, rd, 'out_data/', end_date=rd2) #download the data
+            out = download_sentinel_amazon(lat, lon, rd, 'out_data/', end_date=rd2)  # download the data
             if out == 6:
                 return True
         except:
@@ -320,7 +316,6 @@ def prepare_image():
 
 
 def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secret):
-
     bot_on = True
     delay_tweet = False
     reload = True
@@ -333,26 +328,31 @@ def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secre
 
         time.sleep(1)  # Need to delay requests to geolocaters in order to stay under daily limit!
         if reload:
-            tweets = get_all_tweets(screen_name, consumer_key, consumer_secret, access_key, access_secret)  # grabs latest tweets
+            tweets = get_all_tweets(screen_name, consumer_key, consumer_secret, access_key,
+                                    access_secret)  # grabs latest tweets
         reload = False  # Don't need to reload tweets unless we have posted a new one
 
         if not os.path.isdir('out_data'):
             os.mkdir('out_data')  # where we will store the output
 
         country, rd1, rd2, lat, lon = get_place_check_valid()  # generate lat/lon + dates, grab the country name
-        print(country)
 
         tweet, fp, day, month, year = format_tweet(country, lat, lon)
+        print('Found image in %s on day:%s, month:%s, year:%s, testing preview' % (country, day, month, year))
         done = checkifdone(tweet, tweets)
 
         if done:
+            print('This tweets come up recently, restarting loop')
             os.system('rm -r out_data')
             continue
 
         date_of_image = datetime.datetime(year, month, day)
         os.chdir(fp)
-        test = cv2.imread('preview.jpg')  #Before downloading the full size images, do some check checks for clouds/colour
-        image_check_test = image_check(test,lat,lon,date_of_image - timedelta(days=1),date_of_image + timedelta(days=1))
+        test = cv2.imread(
+            'preview.jpg')  # Before downloading the full size images, do some check checks for clouds/colour
+        print('Checking image contrast/quality...')
+        image_check_test = image_check(test, lat, lon, date_of_image - timedelta(days=1),
+                                       date_of_image + timedelta(days=1))
 
         if image_check_test == False:  # Continue if the test fails
             continue
@@ -365,9 +365,9 @@ def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secre
         cv2.imwrite('out.jpg', image.astype(np.uint8))
         fsize = os.stat('out.jpg')
 
-        while int(fsize.st_size) > 3070000:  #Keep resizing until the media file is <3 mb
+        while int(fsize.st_size) > 3070000:  # Keep resizing until the media file is <3 mb
             im = cv2.imread('out.jpg')
-            cv2.imwrite('out.jpg', cv2.resize(im, (0,0), fx=0.98, fy=0.98) )
+            cv2.imwrite('out.jpg', cv2.resize(im, (0, 0), fx=0.98, fy=0.98))
             fsize = os.stat('out.jpg')
         if delay_tweet:
             wait_time = 1800 - (datetime.datetime.now() - starttime).seconds
