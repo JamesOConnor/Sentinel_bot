@@ -393,7 +393,7 @@ def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secre
                 ''
             else:
                 for i in tqdm(range(wait_time)):
-                    time.sleep(1)  # Tweet every 15 minutes
+                    time.sleep(1)  # Tweet every 30 minutes
         delay_tweet = False
         try:
             api.update_with_media('out.jpg', status=tweet)
