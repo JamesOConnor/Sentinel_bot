@@ -200,7 +200,7 @@ def get_place_check_valid():
             return country, rd, rd2, lat, lon
 
 
-def format_tweet(country, lat, lon):
+def format_tweet(country, lat, lon, false_col=False):
     '''
     Given a country, latitude and longitude, this will format a tweet based on the preview file downloaded by
     grabba_grabba
@@ -245,7 +245,11 @@ def format_tweet(country, lat, lon):
             country = 'The Congo'
         if 'Myanmar' in country:
             country = 'Myanmar'
-        tweet = 'Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space' % (
+        if false_col == True:
+            tweet = 'NIR-R-G Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space' % (
+                str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')))
+        else:
+            tweet = 'Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space' % (
             str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')))
     else:
         tweet = 'Image of International space (%.2f, %.2f), from the %d%s of %s, %s' % (
@@ -307,9 +311,14 @@ def prepare_image():
     if int(rsize.st_size) < 13070000:
         os.system('rm -r out_data')
         return 0, False
-    r = glymur.Jp2k('B04.jp2')[:]
-    b = glymur.Jp2k('B02.jp2')[:]
-    g = glymur.Jp2k('B03.jp2')[:]
+    if false_col == False:
+        r = glymur.Jp2k('B04.jp2')[:]
+        b = glymur.Jp2k('B02.jp2')[:]
+        g = glymur.Jp2k('B03.jp2')[:]
+    else:
+        r = glymur.Jp2k('B08.jp2')[:]
+        b = glymur.Jp2k('B03.jp2')[:]
+        g = glymur.Jp2k('B04.jp2')[:]
     image = np.zeros((r.shape[0], r.shape[1], 3))
     image[:, :, 0] = b
     image[:, :, 1] = g
@@ -354,8 +363,11 @@ def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secre
             os.mkdir('out_data')  # where we will store the output
 
         country, rd1, rd2, lat, lon = get_place_check_valid()  # generate lat/lon + dates, grab the country name
-
-        tweet, fp, day, month, year = format_tweet(country, lat, lon)
+        if np.random.rand() < .2:
+            false_col = True
+        else:
+            false_col = False
+        tweet, fp, day, month, year = format_tweet(country, lat, lon, false_col=false_col)
         print('Found image in %s on day:%s, month:%s, year:%s, testing preview' % (country, day, month, year))
         done = checkifdone(tweet, tweets)
 
@@ -376,7 +388,7 @@ def sentbot(screen_name, consumer_key, consumer_secret, access_key, access_secre
             continue
 
         os.chdir(fp)
-        image, passed = prepare_image()
+        image, passed = prepare_image(false_col=false_col)
         if passed == False:
             continue
         os.chdir('../../../../../../../../')

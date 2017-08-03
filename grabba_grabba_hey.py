@@ -296,6 +296,8 @@ def download_sentinel_amazon(longitude, latitude, start_date, output_dir,
             inds.append(i)
         if 'B04.j' in i:
             inds.append(i)
+        if 'B08.j' in i:
+            inds.append(i)
     files_to_download=inds
     the_urls = []
     for fich in files_to_download:
