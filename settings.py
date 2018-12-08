@@ -1,5 +1,7 @@
 import os
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 SCIHUB_USER = os.environ.get('SCIHUB_USER')
 SCIHUB_PASSWORD = os.environ.get('SCIHUB_PASSWORD')
 
@@ -13,3 +15,5 @@ CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 ACCESS_KEY = os.environ.get('ACCESS_KEY')
 ACCESS_SECRET = os.environ.get('ACCESS_SECRET')
+
+TEST_FIXTURE_PATH = os.path.join(ROOT_DIR, 'tests/fixtures')
