@@ -5,7 +5,7 @@ install:
   - "pip install -r requirements.txt"
 script:
   - py.test
-  - coverage run --source=pyskel -m py.test
+  - coverage run --source=Sentinel_bot -m py.test
 after_success:
   - coveralls
 sudo: false
