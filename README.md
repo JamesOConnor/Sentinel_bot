@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/JamesOConnor/Sentinel_bot.svg?branch=master)](https://travis-ci.org/JamesOConnor/Sentinel_bot)
+
 # Sentinel_bot
 Code for running sentinel_bot, a twitter account which posts satellite images
 
