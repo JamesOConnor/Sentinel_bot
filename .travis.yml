@@ -7,4 +7,5 @@ script:
   - py.test
   - coverage run --source=pyskel -m py.test
 after_success:
-- coveralls
+  - coveralls
+sudo: false
