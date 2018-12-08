@@ -44,13 +44,11 @@ def run_bot():
             time.sleep(3600)
             continue
         res_json = res.json()
-        print(
-            'Scihub resp: %s, Results count: %s' % (res.status_code, res_json['feed']['opensearch:totalResults'] or 0))
-        if not res_json['feed']['opensearch:totalResults']:
-            continue
-
         if int(res_json['feed']['opensearch:totalResults']) == 0:
             continue
+
+        print(
+            'Scihub resp: %s, Results count: %s' % (res.status_code, res_json['feed']['opensearch:totalResults'] or 0))
 
         im_date, preview, product_link = get_image_from_search(res_json)
         print('Image date: %s' % im_date)
@@ -122,6 +120,8 @@ def translate_country_names(country):
     """
     if country == 'Mexicanos':
         country = 'Mexico'
+    elif country == 'PRC':
+        country = 'China'
     elif country == 'Soomaaliya':
         country = 'Somalia'
     elif country == 'Viti':
@@ -375,12 +375,24 @@ def get_image_from_search(res_json):
     :return: image date, preview url, product url
     """
     first_res = res_json['feed']['entry'] if res_json['feed']['opensearch:totalResults'] is '1' else \
-        res_json['feed']['entry'][0]
+        check_for_atm_corr(res_json)
     preview = first_res['link'][2]['href']
     product_link = first_res['link'][0]['href']
     im_date = first_res['summary'].split(',')[0].split('T')[0].split(' ')[1]
     return im_date, preview, product_link
 
+
+def check_for_atm_corr(res_json):
+    """
+    Checks if any of the results are L2A (Atmospherically corrected)
+    :param res_json: json response of search
+    :return: First atmospherically corrected result, else the first L1C result
+    """
+    l2a_results = [res for res in res_json['feed']['entry'] if 'L2A' in res['title']]
+    if not l2a_results:
+        return res_json['feed']['entry'][0]
+    else:
+        return l2a_results[0]
 
 if __name__ == '__main__':
     run_bot()
