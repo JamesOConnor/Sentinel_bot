@@ -17,3 +17,5 @@ ACCESS_KEY = os.environ.get('ACCESS_KEY')
 ACCESS_SECRET = os.environ.get('ACCESS_SECRET')
 
 TEST_FIXTURE_PATH = os.path.join(ROOT_DIR, 'tests/fixtures')
+
+MAP_URL = 'https://www.google.com/maps/?map_action=map&center=%s,%s&zoom=10&basemap=satellite'

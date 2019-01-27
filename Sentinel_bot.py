@@ -37,7 +37,7 @@ def run_bot():
         rd = get_random_date()
 
         url = settings.SCIHUB_SEARCH_URL % (
-        lat, lon, rd.strftime("%Y-%m-%dT%H:%M:%SZ"), (rd + timedelta(days=60)).strftime("%Y-%m-%dT%H:%M:%SZ"), 0.1)
+            lat, lon, rd.strftime("%Y-%m-%dT%H:%M:%SZ"), (rd + timedelta(days=60)).strftime("%Y-%m-%dT%H:%M:%SZ"), 0.1)
 
         res = requests.get(url, auth=auth)
         if res.status_code == 503:
@@ -170,11 +170,13 @@ def format_tweet(country, lat, lon, day, month, year, false_col=False):
         country = country.replace("-", "")
         country = assign_country_shortnames(country)
         if false_col == True:
-            tweet = 'NIR-R-G Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space' % (
-                str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')))
+            tweet = 'NIR-R-G Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space %s' % (
+                str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')),
+                settings.MAP_URL % (lat, lon))
         else:
-            tweet = 'Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space' % (
-                str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')))
+            tweet = 'Image of %s (%.2f, %.2f) from the %d%s of %s, %s #ESA #EU #%s #Sentinel #space %s' % (
+                str(country), lat, lon, day, suffix, month, year, ''.join(str(country).split(' ')),
+                settings.MAP_URL % (lat, lon))
     else:
         tweet = 'Image of International space (%.2f, %.2f), from the %d%s of %s, %s' % (
             lat, lon, day, suffix, month, year)
@@ -393,6 +395,7 @@ def check_for_atm_corr(res_json):
         return res_json['feed']['entry'][0]
     else:
         return l2a_results[0]
+
 
 if __name__ == '__main__':
     run_bot()
