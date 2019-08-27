@@ -43,6 +43,8 @@ def run_bot():
         if res.status_code == 503:
             time.sleep(3600)
             continue
+        if not res.ok:
+            continue
         res_json = res.json()
         if int(res_json['feed']['opensearch:totalResults']) == 0:
             continue
