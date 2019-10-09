@@ -68,8 +68,11 @@ def run_bot():
 
         print('Image found for %s' % country)
         download_tile(auth, product_link)
-        unzip_tile()
-
+        try:
+            unzip_tile()
+        except zipfile.BadZipFile:
+            clean_up_directory()
+            continue
         bands, boa, false_colour, fp = retrieve_bands_for_image()
 
         image = read_bands(bands, fp)
