@@ -71,7 +71,6 @@ def run_bot():
         try:
             unzip_tile()
         except zipfile.BadZipFile:
-            clean_up_directory()
             continue
         bands, boa, false_colour, fp = retrieve_bands_for_image()
 
